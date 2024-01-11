@@ -4,6 +4,7 @@ from core.apis.decorators import AuthPrincipal
 from core.libs import helpers, assertions
 from core.models.teachers import Teacher
 from core.models.students import Student
+from core.models.principals import Principal
 from sqlalchemy.types import Enum as BaseEnum
 
 
@@ -91,3 +92,9 @@ class Assignment(db.Model):
     @classmethod
     def get_assignments_by_teacher(cls, teacher_id):
         return cls.filter(cls.teacher_id == teacher_id).all()
+    
+    @classmethod
+    def get_assignments_by_principal(cls, principal_id):
+        principal = Principal.get_by_id(principal_id)
+        assertions.assert_found(principal, 'No principal with this id was found')
+        return cls.filter(cls.state.in_([AssignmentStateEnum.GRADED, AssignmentStateEnum.SUBMITTED])).all()
