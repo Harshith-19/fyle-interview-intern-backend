@@ -30,17 +30,17 @@ def authenticate_principal(func):
         )
 
         if request.path.startswith('/student'):
+            assertions.assert_true(p.student_id is not None, 'requester should be a student')
             validation = Student.validate(p)
             assertions.assert_true(validation, 'Validation failed')
-            assertions.assert_true(p.student_id is not None, 'requester should be a student')
         elif request.path.startswith('/teacher'):
+            assertions.assert_true(p.teacher_id is not None, 'requester should be a teacher')
             validation = Teacher.validate(p)
             assertions.assert_true(validation, 'Validation failed')
-            assertions.assert_true(p.teacher_id is not None, 'requester should be a teacher')
         elif request.path.startswith('/principal'):
+            assertions.assert_true(p.principal_id is not None, 'requester should be a principal')
             validation = Principal.validate(p)
             assertions.assert_true(validation, 'Validation failed')
-            assertions.assert_true(p.principal_id is not None, 'requester should be a principal')
         else:
             assertions.assert_found(None, 'No such api')
 
