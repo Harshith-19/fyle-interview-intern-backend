@@ -45,10 +45,11 @@ class Assignment(db.Model):
         return cls.filter(cls.id == _id).first()
 
     @classmethod
-    def upsert(cls, assignment_new: 'Assignment'):
+    def upsert(cls, assignment_new: 'Assignment', auth_principal: AuthPrincipal):
         if assignment_new.id is not None:
             assignment = Assignment.get_by_id(assignment_new.id)
             assertions.assert_found(assignment, 'No assignment with this id was found')
+            assertions.assert_valid(assignment.student_id == auth_principal.student_id, 'This assignment belongs to some other student')
             assertions.assert_valid(assignment.state == AssignmentStateEnum.DRAFT,
                                     'only assignment in draft state can be edited')
 
