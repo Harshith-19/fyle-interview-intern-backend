@@ -13,7 +13,7 @@ principal_assignments_resources = Blueprint('principal_assignments_resources', _
 @decorators.authenticate_principal
 def list_assignments(p):
     """Returns list of assignments"""
-    principals_assignments = Assignment.get_assignments_by_principal(p.principal_id)
+    principals_assignments = Assignment.get_assignments_by_principal()
     principals_assignments_dump = AssignmentSchema().dump(principals_assignments, many=True)
     return APIResponse.respond(data=principals_assignments_dump)
 
@@ -22,7 +22,7 @@ def list_assignments(p):
 @decorators.authenticate_principal
 def list_teachers(p):
     """Returns list of teachers"""
-    teachers = Teacher.get_teachers_by_principal(p.principal_id)
+    teachers = Teacher.get_teachers_by_principal()
     teachers_dump = TeacherSchema().dump(teachers, many=True)
     return APIResponse.respond(data=teachers_dump)
 
@@ -36,8 +36,7 @@ def grade_assignment(p, incoming_payload):
 
     graded_assignment = Assignment.mark_grade_by_principal(
         _id=grade_assignment_payload.id,
-        grade=grade_assignment_payload.grade,
-        auth_principal=p
+        grade=grade_assignment_payload.grade
     )
     db.session.commit()
     graded_assignment_dump = AssignmentSchema().dump(graded_assignment)

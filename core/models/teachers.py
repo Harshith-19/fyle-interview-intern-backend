@@ -2,6 +2,7 @@ from core import db
 from core.libs import helpers
 from core.models.principals import Principal
 from core.libs import assertions
+from core.apis.authprincipal import AuthPrincipal
 
 
 class Teacher(db.Model):
@@ -22,7 +23,17 @@ class Teacher(db.Model):
     
 
     @classmethod
-    def get_teachers_by_principal(cls, principal_id):
-        principal = Principal.get_by_id(principal_id)
-        assertions.assert_found(principal, 'No principal with this id was found')
+    def get_by_id(cls, _id):
+        return cls.filter(cls.id == _id).first()
+    
+
+    @classmethod
+    def validate(cls, auth_principal : AuthPrincipal):
+        teacher = cls.get_by_id(auth_principal.teacher_id)
+        assertions.assert_found(teacher, 'No teacher with this id was found')
+        return teacher.user_id == auth_principal.user_id
+    
+
+    @classmethod
+    def get_teachers_by_principal(cls):
         return cls.filter().all()

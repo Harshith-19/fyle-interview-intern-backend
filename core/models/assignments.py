@@ -1,10 +1,9 @@
 import enum
 from core import db
-from core.apis.decorators import AuthPrincipal
+from core.apis.authprincipal import AuthPrincipal
 from core.libs import helpers, assertions
 from core.models.teachers import Teacher
 from core.models.students import Student
-from core.models.principals import Principal
 from sqlalchemy.types import Enum as BaseEnum
 
 
@@ -90,11 +89,9 @@ class Assignment(db.Model):
     
 
     @classmethod
-    def mark_grade_by_principal(cls, _id, grade, auth_principal: AuthPrincipal):
+    def mark_grade_by_principal(cls, _id, grade):
         assignment = Assignment.get_by_id(_id)
         assertions.assert_found(assignment, 'No assignment with this id was found')
-        principal = Principal.get_by_id(auth_principal.principal_id)
-        assertions.assert_found(principal, 'No principal with this id was found')
         assertions.assert_valid(assignment.state in [AssignmentStateEnum.SUBMITTED, AssignmentStateEnum.GRADED] ,'assignment is not yet submitted or graded')
 
         assignment.grade = GradeEnum[grade]
@@ -113,7 +110,5 @@ class Assignment(db.Model):
         return cls.filter(cls.teacher_id == teacher_id).all()
     
     @classmethod
-    def get_assignments_by_principal(cls, principal_id):
-        principal = Principal.get_by_id(principal_id)
-        assertions.assert_found(principal, 'No principal with this id was found')
+    def get_assignments_by_principal(cls):
         return cls.filter(cls.state.in_([AssignmentStateEnum.GRADED, AssignmentStateEnum.SUBMITTED])).all()
